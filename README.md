@@ -1,4 +1,4 @@
-# adaptive_lif
+# nengo_alif_steady_state
 Contains the AdaptiveLIF neuron model to be used in nengo
 
 Installation
