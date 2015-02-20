@@ -7,6 +7,10 @@ import numpy as np
 from nengo import AdaptiveLIFRate, LIF
 from nengo.params import Parameter, NumberParam
 from nengo.utils.compat import range
+from nengo.builder.builder import Builder
+from nengo.builder.signal import Signal
+from nengo.builder.neurons import SimNeurons
+
 
 class AdaptiveLIF(AdaptiveLIFRate, LIF):
     """Adaptive spiking version of the LIF neuron model."""
@@ -125,3 +129,19 @@ class AdaptiveLIF(AdaptiveLIFRate, LIF):
         n *= dec  # decay adaptation
         LIF.step_math(self, dt, J - n, spiked, voltage, ref)
         n += inc * (self.inc_n * spiked)  # increment adaptation
+
+
+@Builder.register(AdaptiveLIF)
+def build_alif(model, alif, neurons):
+    model.sig[neurons]['voltage'] = Signal(
+        np.zeros(neurons.size_in), name="%s.voltage" % neurons)
+    model.sig[neurons]['refractory_time'] = Signal(
+        np.zeros(neurons.size_in), name="%s.refractory_time" % neurons)
+    model.sig[neurons]['adaptation'] = Signal(
+        np.zeros(neurons.size_in), name="%s.adaptation" % neurons)
+    model.add_op(SimNeurons(neurons=alif,
+                            J=model.sig[neurons]['in'],
+                            output=model.sig[neurons]['out'],
+                            states=[model.sig[neurons]['voltage'],
+                                    model.sig[neurons]['refractory_time'],
+                                    model.sig[neurons]['adaptation']]))

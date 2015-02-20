@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 import nengo
-from neurons import AdaptiveLIF
+from nengo_alif_steady_state import AdaptiveLIF
 from nengo.utils.numpy import rms
 
 logger = logging.getLogger(__name__)
@@ -15,16 +15,12 @@ def test_alif_neuron(Simulator, plt):
     Tests a single neuron across multiple input currents
     """
     tau_n = .1
-    inc_n = 10.
-    max_rates = np.array([8.095])
-    intercepts = np.array([.059])
-    # tau_n = .1
-    # inc_n = .1
-    # max_rates = np.array([200.])
-    # intercepts = np.array([.2])
+    inc_n = .1
+    max_rates = np.array([200.])
+    intercepts = np.array([.2])
 
     alif_neuron = AdaptiveLIF(tau_rc=.05, tau_ref=.002,
-                                    tau_n=tau_n, inc_n=inc_n)
+                              tau_n=tau_n, inc_n=inc_n)
     u_vals = np.array([
         0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1.])
     Ts = [
@@ -54,9 +50,7 @@ def test_alif_neuron(Simulator, plt):
             sim_rates[idx] = 1. / np.mean(isi[-10:])
         if est_rate > 0.:
             rel_diff = abs(est_rate - sim_rates[idx]) / est_rate
-            assert rel_diff < .01, (
-                'Estimated rate differs from rate extracted from simulation' +
-                ' by more than 1%% for u=%f' % (u))
+            assert rel_diff < .01
         else:
             assert sim_rates[idx] == 0.
 
@@ -99,7 +93,7 @@ def test_alif_neurons(Simulator, plt, rng):
     t_ss = 1.0  # time to consider neurons at steady state
     sim.run(t_final)
 
-    n_select = rng.choice(n)  # pick a random neuron
+    n_select = rng.randint(n)  # pick a random neuron
     t = sim.trange()
     idx = t < t_ss
     plt.figure(figsize=(10, 6))
@@ -127,8 +121,7 @@ def test_alif_neurons(Simulator, plt, rng):
     logger.debug("ME = %f", (sim_rates - math_rates).mean())
     logger.debug("RMSE = %f",
                  rms(sim_rates - math_rates) / (rms(math_rates) + 1e-20))
-    assert np.sum(math_rates > 0) > 0.5 * n, (
-        "At least 50% of neurons must fire")
+    assert np.sum(math_rates > 0) > 0.5 * n
     assert np.allclose(sim_rates, math_rates, atol=1, rtol=0.001)
 
 if __name__ == "__main__":
