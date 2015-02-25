@@ -24,7 +24,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     scripts=[],
-    url="https://github.com/Stanford-BIS/adaptive_lif.git",
+    url="https://github.com/Stanford-BIS/nengo_alif_steady_state.git",
     license="https://github.com/Stanford-BIS/adaptive_lif/blob/master/LICENSE",
     description=description,
     install_requires=[

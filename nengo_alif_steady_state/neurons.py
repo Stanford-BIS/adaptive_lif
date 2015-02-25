@@ -1,12 +1,8 @@
 from __future__ import division
 
-import logging
-
 import numpy as np
 
 from nengo import AdaptiveLIFRate, LIF
-from nengo.params import Parameter, NumberParam
-from nengo.utils.compat import range
 from nengo.builder.builder import Builder
 from nengo.builder.signal import Signal
 from nengo.builder.neurons import SimNeurons
