@@ -61,6 +61,36 @@ def test_alif_neuron(Simulator, plt):
     plt.ylabel('rate')
 
 
+def test_alif_clip(Simulator, plt):
+    """Test that the adaptive LIF membrane voltage can go negative
+
+    The theory for calculating steady state rates does not account for clipping
+    negative voltages to 0
+    """
+    tau_n = .01
+    inc_n = 1.
+    max_rates = np.array([10.])
+    intercepts = np.array([.1])
+
+    alif_neuron = AdaptiveLIF(tau_n=tau_n, inc_n=inc_n)
+    net = nengo.Network()
+    with net:
+        stim = nengo.Node(1.)
+        net.ens = nengo.Ensemble(
+            1, 1, neuron_type=alif_neuron,
+            max_rates=max_rates, intercepts=intercepts)
+        nengo.Connection(stim, net.ens.neurons, synapse=None)
+        probe = nengo.Probe(net.ens.neurons, 'voltage')
+    sim = Simulator(net)
+    sim.run(.1)
+    t = sim.trange()
+
+    plt.plot(t, sim.data[probe])
+    plt.xlabel('time')
+    plt.ylabel('voltage')
+    assert (sim.data[probe] < 0).any()
+
+
 def test_alif_neurons(Simulator, plt, rng):
     """Test that the adaptive LIF dynamic model matches the predicted rates
 
