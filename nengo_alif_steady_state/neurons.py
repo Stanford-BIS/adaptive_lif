@@ -14,8 +14,7 @@ class AdaptiveLIF(AdaptiveLIFRate, LIF):
     probeable = ['spikes', 'adaptation', 'voltage', 'refractory_time']
 
     def __init__(self, **kwargs):
-        super(AdaptiveLIF, self).__init__(**kwargs)
-        self.clip = -np.inf
+        super(AdaptiveLIF, self).__init__(min_voltage=-np.inf, **kwargs)
 
     def _J_tspk(self, tspk):
         """Computes the input J that produces a steady state spike interval"""
